@@ -4,7 +4,10 @@ import whatsappLogo from "./logo.png";
 
 const SignIn = () => {
   const signIn = () => {
-    auth.signInWithPopup(provider).catch((error) => console.log(error));
+    auth
+      .signInWithPopup(provider)
+      .catch((error) => console.log(error))
+      .then(window.close());
   };
   return (
     <div className="container">
