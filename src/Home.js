@@ -11,13 +11,19 @@ const Home = ({ user }) => {
 
   const addMessage = async (e) => {
     e.preventDefault();
-    await db.collection("messages").add({
-      sender: user.displayName,
-      email: user.email,
-      message: inpValue,
-      time: new Date().getTime(),
-    });
-    setinpValue("");
+    if (
+      inpValue.length &&
+      !inpValue.endsWith(" ") &&
+      !inpValue.startsWith(" ")
+    ) {
+      await db.collection("messages").add({
+        sender: user.displayName,
+        email: user.email,
+        message: inpValue,
+        time: new Date().getTime(),
+      });
+      setinpValue("");
+    }
   };
   return (
     <div>
@@ -65,7 +71,7 @@ const Home = ({ user }) => {
                   value={inpValue}
                   onChange={(e) => setinpValue(e.target.value)}
                 />
-                <button className="btn btn-outline-primary ms-1" type="button">
+                <button className="btn btn-outline-primary ms-1" type="submit">
                   Send
                 </button>
               </form>

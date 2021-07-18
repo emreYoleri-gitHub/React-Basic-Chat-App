@@ -46,7 +46,7 @@ main header {
   padding-left: 0;
   margin: 0;
   list-style-type: none;
-  overflow-y: scroll;
+  overflow-y: auto;
   height: 535px;
   border-top: 2px solid #fff;
   border-bottom: 2px solid #fff;
@@ -97,7 +97,7 @@ main header {
 }
 #chat .me .triangle {
   border-color: transparent transparent #6fbced transparent;
-  margin-left: 375px;
+  margin-left: 390px;
 }
 
 main footer {
