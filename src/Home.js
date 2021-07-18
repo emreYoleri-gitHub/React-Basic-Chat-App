@@ -4,81 +4,130 @@ import db, { auth } from "./firebase";
 import "./Home.css";
 
 const Home = ({ user }) => {
-  const [inpValue, setinpValue] = useState("");
-  const [messages] = useCollectionData(
+  const [inpValue, setInpValue] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+
+  const [dataMessages] = useCollectionData(
     db.collection("messages").orderBy("time", "asc")
   );
 
+  const messages = dataMessages?.filter(
+    (m) => m.email === user.email || m.receiver === user.email
+  );
+
+  const [dataUsers] = useCollectionData(db.collection("users"));
+
+  const users = dataUsers?.filter((u) => u.email !== user.email);
+
   const addMessage = async (e) => {
     e.preventDefault();
-    if (
-      inpValue.length &&
-      !inpValue.endsWith(" ") &&
-      !inpValue.startsWith(" ")
-    ) {
-      await db.collection("messages").add({
-        sender: user.displayName,
-        email: user.email,
-        message: inpValue,
-        time: new Date().getTime(),
-      });
-      setinpValue("");
-    }
+    await db.collection("messages").add({
+      sender: user.displayName,
+      receiver: currentUser.email,
+      email: user.email,
+      text: inpValue,
+      time: new Date().getTime(),
+    });
+    setInpValue("");
   };
+
   return (
-    <div>
-      <div id="container">
-        <main>
-          <header>
-            <button
-              className="btn btn-outline-danger"
-              onClick={() => auth.signOut()}
-            >
-              Sign Out
-            </button>
-          </header>
-          <ul id="chat">
-            {messages?.length ? (
-              messages.map((m, i) => {
+    <div id="container">
+      <aside>
+        <header>
+          <h2>Peoples</h2>
+        </header>
+        <ul>
+          {users?.map((user, i) => {
+            return (
+              <li
+                className="d-flex align-items-center"
+                key={i}
+                onClick={() => setCurrentUser(user)}
+              >
+                <img src={user.photoURL} alt="" height="50" />
+                <h1 style={{ fontSize: "23px", color: "white" }}>
+                  {user.name}
+                </h1>
+              </li>
+            );
+          })}
+          {users?.length ? null : (
+            <h2 style={{ color: "white", textAlign: "center" }}>
+              Kullanıcı Yok
+            </h2>
+          )}
+        </ul>
+        <div className="text-center mt-3">
+          <button
+            className="btn btn-outline-danger"
+            onClick={() => auth.signOut()}
+          >
+            Sign Out
+          </button>
+        </div>
+      </aside>
+      <main>
+        {currentUser ? (
+          <>
+            <header>
+              <img src={currentUser.photoURL} height="50" alt="" />
+              <div>
+                <h2>{currentUser.name}</h2>
+                <h3>{currentUser.email}</h3>
+              </div>
+            </header>
+            <ul id="chat">
+              {messages?.map((message, i) => {
                 return (
-                  <li className={m.email === user.email ? "me" : "you"} key={i}>
+                  <li
+                    className={
+                      message.email === user.email
+                        ? `${
+                            currentUser.email === message.receiver ? "me" : "no"
+                          }`
+                        : `
+                        ${currentUser.email === message.email ? "you" : "no"}`
+                    }
+                    key={i}
+                  >
                     <div className="entete">
-                      <h2 style={{ color: "wheat" }}>{m.sender}</h2>
                       <span
-                        className={`status ms-1 ${
-                          m.email === user.email ? "blue" : "green"
+                        className={`status me-2 ${
+                          message.email === user.email ? "blue" : "green"
                         }`}
                       ></span>
+                      <h2>{message.sender}</h2>
                     </div>
-                    <div className="triangle"></div>
-                    <div className="message">{m.message}</div>
+                    <div className="triangle "></div>
+                    <div className="message">{message.text}</div>
                   </li>
                 );
-              })
-            ) : (
-              <h1 style={{ color: "white", textAlign: "center" }}>
-                Sohbet Yok
-              </h1>
-            )}
-          </ul>
-          <footer>
-            <div className="input-group">
-              <form className="d-flex w-100" onSubmit={(e) => addMessage(e)}>
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Send messeage..."
-                  value={inpValue}
-                  onChange={(e) => setinpValue(e.target.value)}
-                />
-                <button className="btn btn-outline-primary ms-1" type="submit">
-                  Send
-                </button>
+              })}
+            </ul>
+            <footer>
+              <form onSubmit={(e) => addMessage(e)}>
+                <div className="input-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Type message..."
+                    value={inpValue}
+                    onChange={(e) => setInpValue(e.target.value)}
+                  />
+                  <button className="btn btn-info" type="submit">
+                    Send
+                  </button>
+                </div>
               </form>
-            </div>
-          </footer>
-        </main>
-      </div>
+            </footer>
+          </>
+        ) : (
+          <div className="text-center mt-3">
+            <p className="lead">Mesajlaşmaya başlamak için kullanıcı seçiniz</p>
+          </div>
+        )}
+      </main>
     </div>
   );
 };
