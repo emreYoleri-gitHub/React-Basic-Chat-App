@@ -61,7 +61,7 @@ const Home = ({ user }) => {
         <div className="text-center mt-3">
           <button
             className="btn btn-outline-danger"
-            onClick={() => auth.signOut()}
+            onClick={() => auth.sigut()}
           >
             Sign Out
           </button>
@@ -84,23 +84,47 @@ const Home = ({ user }) => {
                     className={
                       message.email === user.email
                         ? `${
-                            currentUser.email === message.receiver ? "me" : "no"
+                            currentUser.email === message.receiver ? "me" : ""
                           }`
                         : `
-                        ${currentUser.email === message.email ? "you" : "no"}`
+                        ${currentUser.email === message.email ? "you" : ""}`
                     }
+                    style={{
+                      display:
+                        currentUser.email == message.receiver ||
+                        currentUser.email === message.email
+                          ? ""
+                          : "none",
+                    }}
                     key={i}
                   >
                     <div className="entete">
                       <span
                         className={`status me-2 ${
-                          message.email === user.email ? "blue" : "green"
+                          message.email === user.email
+                            ? `${
+                                currentUser.email === message.receiver
+                                  ? "blue"
+                                  : ""
+                              }`
+                            : `
+                        ${currentUser.email === message.email ? "green" : ""}`
                         }`}
                       ></span>
-                      <h2>{message.sender}</h2>
+                      <h2>
+                        {currentUser.email == message.receiver ||
+                        currentUser.email === message.email
+                          ? message.sender
+                          : null}
+                      </h2>
                     </div>
-                    <div className="triangle "></div>
-                    <div className="message">{message.text}</div>
+                    <div className="triangle"></div>
+                    <div className="message">
+                      {currentUser.email == message.receiver ||
+                      currentUser.email === message.email
+                        ? message.text
+                        : null}
+                    </div>
                   </li>
                 );
               })}
