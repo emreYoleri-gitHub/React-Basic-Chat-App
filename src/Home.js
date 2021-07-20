@@ -61,7 +61,7 @@ const Home = ({ user }) => {
         <div className="text-center mt-3">
           <button
             className="btn btn-outline-danger"
-            onClick={() => auth.sigut()}
+            onClick={() => auth.signOut()}
           >
             Sign Out
           </button>
